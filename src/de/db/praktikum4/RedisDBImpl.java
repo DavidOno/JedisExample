@@ -19,16 +19,15 @@ public class RedisDBImpl implements RedisDB {
 	private static final Logger log = LoggerFactory.getLogger(RedisDBImpl.class);
 	
 	private static final String RATING = "Rating";
+	private static final String RATERSET_FLAG = "-raterset";
 	private static final String TITEL = "Titel";
 	private static final String AUTHOR = "Author";
 	
 	private static RedisDB instance;
 	private Jedis jedis;
-	private List<Article2RaterSet> article2raterSet;
 	
 	private RedisDBImpl() {
 		jedis = new Jedis();
-		article2raterSet = new ArrayList<>();
 	}
 
 	@Override
@@ -36,14 +35,7 @@ public class RedisDBImpl implements RedisDB {
 		String articleUID = generateUID();
 		Map<String, String> values = buildValueMap(title, author);
 		jedis.hmset(articleUID, values);
-		initRaterSet(articleUID);
 		return articleUID;
-	}
-
-	private void initRaterSet(String articleUID) {
-		String raterSetUID = generateUID();
-		Article2RaterSet a2r = new Article2RaterSet(articleUID, raterSetUID);
-		article2raterSet.add(a2r);
 	}
 
 	private Map<String, String> buildValueMap(String title, String author) {
@@ -81,11 +73,7 @@ public class RedisDBImpl implements RedisDB {
 	}
 
 	private String getRaterSetUIDForArticle(String articleId) {
-		return article2raterSet.stream()
-						.filter(a2r -> a2r.isArticleContained(articleId))
-						.map(Article2RaterSet::getRaterUID)
-						.findFirst()
-						.orElseThrow(() -> new IllegalArgumentException("articleID unknown: "+articleId));
+		return articleId+RATERSET_FLAG;
 	}
 
 	private double calculateUpdatedScore(String articleId, double rating, String raterSetUID) {
@@ -101,7 +89,7 @@ public class RedisDBImpl implements RedisDB {
 		return currentScore.doubleValue();
 	}
 
-	private boolean wasAddSuccessfull(Long result) {
+	private boolean wasAddSuccessfull(long result) {
 		return result == 1;
 	}
 
