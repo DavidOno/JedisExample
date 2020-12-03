@@ -20,7 +20,7 @@ public class RedisDBImpl implements RedisDB {
 	
 	private static final String RATING = "Rating";
 	private static final String RATERSET_FLAG = "-raterset";
-	private static final String TITEL = "Titel";
+	private static final String TITLE = "Titel";
 	private static final String AUTHOR = "Author";
 	
 	private static RedisDB instance;
@@ -41,7 +41,7 @@ public class RedisDBImpl implements RedisDB {
 	private Map<String, String> buildValueMap(String title, String author) {
 		Map<String, String> values = new HashMap<>();
 		values.put(AUTHOR, author);
-		values.put(TITEL, title);
+		values.put(TITLE, title);
 		return values;
 	}
 
